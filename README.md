@@ -44,7 +44,7 @@ According to the example log, heap size is increasing even after garbage collect
 ##### How to use it ?
 1. Compile the code with gcc compiler and also include "jni.h", "jvmti.h" and "jni_md.h" which can be found inside /{your_jdk_path}/Contents/Home/include/ and /{your_jdk_path}/Contents/Home/include/linux/ folder as an example, gcc -I/Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home/include/ -I/Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home/include/darwin/ -shared -o gar.so -fPIC garbage_collection_tracker.c
 2. Attach the shared file as a agent to the JVM, as an example: java -agentpath:./gar.so=/Users/swoven/Desktop/mleak.log,KB Test 
-3. Options needs to be passed to the agent in comma seperated way like above, first option is the path of file where you want to print your logs and seconf option is the unit of heap size you can see as an example java -agentpath:./gar.so=/Users/swoven/Desktop/mleak.log,KB Test on this command /Users/swoven/Desktop/mleak.log is the path where the log will be printed and the heap size will be printed in KB unit. 
+3. Options needs to be passed to the agent in comma seperated format, first option is the path of file where you would want to print the log and the second option is the unit of heap size as an example 'java -agentpath:./gar.so=/Users/swoven/Desktop/mleak.log,KB Test', in this command (Before comma)/Users/swoven/Desktop/mleak.log is the path where the log will be printed and the heap size will be printed in KB (after comma) unit. 
 
 
 
