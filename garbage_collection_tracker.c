@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <sys/time.h>
 #include <unistd.h>
 
 #include "jni.h"
@@ -16,6 +17,8 @@ static jrawMonitorID lock;
 // global variable to calculate heap size
 static long total_heap_size;
 static time_t garbage_collection_start;
+static int gc_start_time_millis;
+static int gc_end_time_millis;
 static time_t garbage_collection_stop;
 // global variable to hold passed option from user
 static char *parsed_options[2];
@@ -31,6 +34,17 @@ static FILE *fpw;
 static void reset()
 {
   total_heap_size = 0;
+  gc_start_time_millis = 0;
+  gc_end_time_millis = 0;
+}
+
+static int64_t currentTimeMillis()
+{
+  struct timeval time;
+  gettimeofday(&time, NULL);
+  int64_t s1 = (int64_t)(time.tv_sec) * 1000;
+  int64_t s2 = (time.tv_usec / 1000);
+  return s1 + s2;
 }
 
 /**
@@ -124,7 +138,8 @@ thread_worker(jvmtiEnv *jvmti, JNIEnv *jni, void *p)
     /* Iterate over the heap and count */
     err = (*jvmti)->IterateOverHeap(jvmti, JVMTI_HEAP_OBJECT_EITHER,
                                     &heapObject, NULL);
-    fprintf(fpw, "GC pause time: %.2f s\nTotal Heap Size: %li %s\n", difftime(garbage_collection_stop, garbage_collection_start), total_heap_size / divider, parsed_options[1]);
+    // fprintf(fpw, "GC pause time: %.2f s\nTotal Heap Size: %li %s\n", difftime(garbage_collection_stop, garbage_collection_start), total_heap_size / divider, parsed_options[1]);
+    fprintf(fpw, "GC pause time: %d ms\nTotal Heap Size: %li %s\n", gc_end_time_millis - gc_start_time_millis, total_heap_size / divider, parsed_options[1]);
     reset();
   }
 }
@@ -205,6 +220,7 @@ static void JNICALL
 gc_start(jvmtiEnv *jvmti_env)
 {
   time(&garbage_collection_start);
+  gc_start_time_millis = currentTimeMillis();
   fprintf(fpw, "GC started: %s", ctime(&garbage_collection_start));
 }
 
@@ -232,6 +248,7 @@ gc_finish(jvmtiEnv *jvmti_env)
     }
     err = (*jvmti)->RawMonitorExit(jvmti, lock);
     time(&garbage_collection_stop);
+    gc_end_time_millis = currentTimeMillis();
     fprintf(fpw, "GC stopped: %s", ctime(&garbage_collection_stop));
   }
 }
