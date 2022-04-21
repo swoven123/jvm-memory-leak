@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+
+<body>
+  <input type="file" name="inputfile" id="inputfile">
+  <br>
+  <pre id="output"></pre>
+  <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+  <script type="text/javascript">
+    document.getElementById('inputfile')
+      .addEventListener('change', function () {
+        let fr = new FileReader();
+        fr.onload = function () {
+          let xRows = [];
+          let yRows = [];
+          let allRows = this.result.split('\n');
+          let unitOfHeap = allRows[0].split(":")[1].slice(-2);
+          let unitOfTime = allRows[3].split(":")[1].slice(-1);
+          xRows[0] = 0;
+          yRows[0] = Number(allRows[0].split(":")[1].replace(' ' + unitOfHeap, '').trim());
+          let lastPauseTime = 0;
+          for (let row = 1; row < allRows.length; row++) {
+            const myArray = allRows[row].split(":");
+            if (myArray[0].startsWith("GC pause")) {
+              let pauseTime = parseFloat(myArray[1].replace(' ', '').replace(unitOfTime, '')) + lastPauseTime;
+              xRows.push(pauseTime);
+              lastPauseTime = pauseTime;
+            } else if (myArray[0].includes("Heap")) {
+              yRows.push(Number(myArray[1].replace(' ', '').replace(unitOfHeap, '')));
+            }
+          }
+
+          let maxYValue = Math.max(...yRows);
+          let minYValue = Math.min(...yRows);
+
+          new Chart("myChart", {
+            type: "line",
+            data: {
+              labels: xRows,
+              datasets: [{
+                fill: false,
+                lineTension: 0,
+                backgroundColor: "rgba(0,0,255,1.0)",
+                borderColor: "rgba(0,0,255,0.1)",
+                data: yRows
+              }]
+            },
+            options: {
+              legend: {
+                display: false
+              },
+              scales: {
+                xAxes: [{
+                  scaleLabel: {
+                    display: true,
+                    labelString: 'GC Timing'
+                  }
+                }],
+                yAxes: [{
+                  scaleLabel: {
+                    display: true,
+                    labelString: 'Heap Size'
+                  },
+                  ticks: {
+                    min: minYValue,
+                    max: maxYValue + minYValue,
+                  }
+                }],
+              }
+            }
+          });
+        }
+        fr.readAsText(this.files[0]);
+      });
+  </script>
+</body>
+
+</html>
