@@ -46,3 +46,7 @@ According to the example log, heap size is increasing even after garbage collect
 2. Attach the shared file as a agent to the JVM, as an example: java -agentpath:./gar.so=/Users/swoven/Desktop/mleak.log,KB Test
 3. Options needs to be passed to the agent in comma seperated format, first option is the path of file where you would want to print the log and the second option is the unit of heap size as an example 'java -agentpath:./gar.so=/Users/swoven/Desktop/mleak.log,KB Test', in this command (Before comma)/Users/swoven/Desktop/mleak.log is the path where the log will be printed and the heap size will be printed in KB (after comma) unit.
 4. Heap size unit currently supported are KB, MB and GB.
+
+### Plotting a graph
+Open the HTML file graph_plotter.html, and then upload the log file to browser, to view the map.
+![](graph_plot.gif)
