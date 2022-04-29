@@ -42,10 +42,12 @@ Total Heap Size: Heap size measured just after garbage collection completed <br>
 According to the example log, heap size is increasing even after garbage collection, therefore we can predict there might be a memory leak. <br>
 
 ### How to use it ?
-1. Compile the code with gcc compiler and also include "jni.h", "jvmti.h" and "jni_md.h" which can be found inside /{your_jdk_path}/Contents/Home/include/ and /{your_jdk_path}/Contents/Home/include/linux/ folder as an example, gcc -I/Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home/include/ -I/Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home/include/darwin/ -shared -o gar.so -fPIC garbage_collection_tracker.c
-2. Attach the shared file as a agent to the JVM, as an example: java -agentpath:./gar.so=/Users/swoven/Desktop/mleak.log,KB Test
-3. Options needs to be passed to the agent in comma seperated format, first option is the path of file where you would want to print the log and the second option is the unit of heap size as an example 'java -agentpath:./gar.so=/Users/swoven/Desktop/mleak.log,KB Test', in this command (Before comma)/Users/swoven/Desktop/mleak.log is the path where the log will be printed and the heap size will be printed in KB (after comma) unit.
-4. Heap size unit currently supported are KB, MB and GB.
+1. Execute the script ./create_so_file.sh with the parameter $JAVA_HOME, as an example ./create_so_file.sh $JAVA_HOME
+2. It created a .so file in the same folder, Attach the shared file as a agent to the JVM, as an example: java -agentpath:./gar.so=/Users/$user_name/Desktop/mleak.log,KB Test
+
+Note: Options needs to be passed to the agent in comma seperated format, first option is the path of file where you would want to print the log and the second option is the unit of heap size as an example 'java -agentpath:./gar.so=/Users/swoven/Desktop/mleak.log,KB Test', in this command (Before comma)/Users/swoven/Desktop/mleak.log is the path where the log will be printed and the heap size will be printed in KB (after comma) unit.
+
+Heap size unit currently supported are KB, MB and GB.
 
 ### Plotting a graph
 Open the HTML file graph_plotter.html, and then upload the log file to browser, to view the map.
